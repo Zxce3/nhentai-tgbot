@@ -3,7 +3,6 @@ from TelegramBot.version import (
     __python_version__,
     __version__,
     __pyro_version__,
-    __license__,
 )
 from pyrogram import Client, filters
 from TelegramBot.config import *
