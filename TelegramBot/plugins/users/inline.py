@@ -52,7 +52,8 @@ async def inline_query_handler(client: Client, query: InlineQuery):
                 date = datetime.fromtimestamp(i["upload_date"])
                 # get scanlator
                 scanlator = i["scanlator"]
-
+                # get pages
+                pages = i["num_pages"]
                 url = f"https://nhentai.net/g/{code}/"
                 thumb = f"https://t.nhentai.net/galleries/{media_id}/cover.jpg"
                 # append the result with image and title
@@ -62,7 +63,7 @@ async def inline_query_handler(client: Client, query: InlineQuery):
                         input_message_content=InputTextMessageContent(
                             f"**Title:** {title} \n**Code:** {code} \n**Date:** {date} \n**Scanlator:** {scanlator} \n**Link:** {url}"
                         ),
-                        description=f"{code}",
+                        description=f"{code} | {pages} pages",
                         thumb_url=thumb,
                         reply_markup=InlineKeyboardMarkup(
                             [
@@ -158,7 +159,7 @@ async def kode_callback(_, query):
         reply_markup=InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("Read", url=url)],
-                [InlineKeyboardButton("Next", callback_data=f"next_{code}_1")],
+                [InlineKeyboardButton("Read Now", callback_data=f"next_{code}_1")],
             ]
         ),
     )
@@ -217,15 +218,10 @@ async def next_callback(_, query):
     thumb = f"https://t.nhentai.net/galleries/{media_id}/cover.jpg"
     # get image
     image = f"https://i.nhentai.net/galleries/{media_id}/{number}.jpg"
-    # if image .jpg not found then use .png
-    if r.get(image).status_code == 404:
-        image = f"https://i.nhentai.net/galleries/{media_id}/{number}.png"
-    # if image .png not found then use .gif
-    if r.get(image).status_code == 404:
-        image = f"https://i.nhentai.net/galleries/{media_id}/{number}.gif"
-    # if image .gif not found then use telegraph
-    if r.get(image).status_code == 404:
-        image = f"https://telegra.ph/file/69043a0dac3789fea967d.png"
+    # if the image is not compitable
+    if number > pages:
+        image = thumb
+
     # get caption
     caption = f"""
 **Title:** {title}
